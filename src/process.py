@@ -1,10 +1,13 @@
 def process_repo_data(data: dict) -> dict:
-    """Extract only the information needed for the report."""
+    """Extract useful information from the API response."""
+
+    if not data:
+        return {}
 
     return {
-        "name": data["full_name"],
-        "stars": data["stargazers_count"],
-        "forks": data["forks_count"],
-        "open_issues": data["open_issues_count"],
-        "watchers": data["watchers_count"],
+        "name": data.get("full_name", "Unknown"),
+        "stars": data.get("stargazers_count", 0),
+        "forks": data.get("forks_count", 0),
+        "open_issues": data.get("open_issues_count", 0),
+        "watchers": data.get("watchers_count", 0),
     }
