@@ -1,5 +1,5 @@
-from fetch import fetch_repo_data
-from process import process_repo_data
+from scheduled_report_bot.fetch import fetch_repo_data
+from scheduled_report_bot.process import process_repo_data
 
 
 def main() -> None:

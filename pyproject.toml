@@ -7,7 +7,9 @@ authors = [
     { name = "Cinnamon-bell", email = "palinko.lompart@gmail.com" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "requests>=2.34.2",
+]
 
 [project.scripts]
 scheduled-report-bot = "scheduled_report_bot:main"
@@ -15,3 +17,8 @@ scheduled-report-bot = "scheduled_report_bot:main"
 [build-system]
 requires = ["uv_build>=0.12.0,<0.13.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
