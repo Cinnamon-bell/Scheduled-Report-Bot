@@ -1,87 +1,246 @@
 # Scheduled Report Bot
 
-A Python automation project that fetches data from the GitHub API, processes the information, and generates a daily summary report. The project is automatically executed using GitHub Actions on a schedule or can be run manually.
+A Python automation tool that fetches GitHub repository data, processes it, and generates a daily summary report automatically using GitHub Actions.
 
-## Project Brief
+## Problem and Target Users
 
-The Scheduled Report Bot automates the process of collecting repository statistics from the GitHub API. It retrieves repository information, cleans and processes the data, and generates a daily report containing key metrics such as stars, forks, watchers, and open issues. The report can be stored in the repository, making it easy to track changes over time. As a future enhancement, the report can be delivered automatically to Discord or email using a webhook.
+Collecting and checking repository statistics manually is repetitive and time-consuming. The Scheduled Report Bot automates this process by fetching repository information from the GitHub API, processing the data, and generating a readable summary. It is intended for developers, students, and small teams who want an automated way to monitor repository statistics without manually collecting the data.
 
 ## Features
 
-- Fetch repository data from the GitHub API.
-- Process and clean the fetched data.
-- Generate a daily summary report.
-- Run automatically with GitHub Actions.
-- Support manual execution through `workflow_dispatch`.
-
-## Project Structure
-
-```
-scheduled-report-bot/
-│
-├── .github/
-│   └── workflows/
-│       └── automation.yml
-├── data/
-├── src/
-│   ├── fetch.py
-│   ├── process.py
-│   └── main.py
-├── tests/
-├── README.md
-├── pyproject.toml
-└── .gitignore
-```
+- Fetches repository data from the GitHub API.
+- Processes and cleans the retrieved data.
+- Generates a summary of important repository statistics.
+- Runs automatically using GitHub Actions.
+- Runs tests automatically using GitHub Actions CI.
+- Supports manual workflow execution.
+- Uses scheduled execution to run without manual intervention.
+- Can be extended to send reports through Discord or email webhooks.
 
 ## Installation
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/<your-username>/scheduled-report-bot.git
-cd scheduled-report-bot
+git clone https://github.com/<your-username>/Scheduled-Report-Bot.git
+cd Scheduled-Report-Bot
 ```
 
-Install dependencies:
+Install the project dependencies using `uv`:
 
 ```bash
 uv sync
 ```
 
-or
+Verify that the project works by running the tests:
 
 ```bash
-pip install -r requirements.txt
+uv run pytest
+```
+
+Expected result:
+
+```text
+4 passed
 ```
 
 ## Usage
 
-Run the project manually:
+Run the application manually with:
 
 ```bash
-uv run src/main.py
+uv run python -m scheduled_report_bot.main
 ```
 
-or
+The application fetches information about the configured GitHub repository.
+
+For example, the bot can retrieve data such as:
+
+```text
+Repository: python/cpython
+Stars: 75000
+Forks: 35000
+Open issues: 12000
+Watchers: 75000
+```
+
+The data is then processed into a smaller summary that can be used to generate the daily report.
+
+### Example input
+
+The application uses a GitHub repository as its input:
+
+```text
+Owner: python
+Repository: cpython
+```
+
+### Example output
+
+```text
+Repository: python/cpython
+Stars: 75000
+Forks: 35000
+Open issues: 12000
+Watchers: 75000
+```
+
+The exact numbers will change because the data is retrieved from the GitHub API.
+
+## How It Works
+
+The project is divided into several small components. Each function has a single responsibility.
+
+```text
+                 GitHub API
+                     │
+                     ▼
+              ┌─────────────┐
+              │   fetch.py  │
+              │ Fetch data  │
+              └──────┬──────┘
+                     │
+                     ▼
+              ┌─────────────┐
+              │ process.py  │
+              │ Clean and   │
+              │ process     │
+              │ data        │
+              └──────┬──────┘
+                     │
+                     ▼
+              ┌─────────────┐
+              │   main.py   │
+              │ Coordinates │
+              │ the process │
+              └──────┬──────┘
+                     │
+                     ▼
+              Daily report
+                     │
+                     ▼
+             GitHub Actions
+              scheduled run
+```
+
+### GitHub Actions
+
+The project contains automated workflows in:
+
+```text
+.github/workflows/
+```
+
+The CI workflow runs the tests automatically when code is pushed and also runs on a daily schedule.
+
+The workflow can also be started manually using `workflow_dispatch`.
+
+## Project Structure
+
+```text
+Scheduled-Report-Bot/
+│
+├── .github/
+│   └── workflows/
+│       ├── automation.yml
+│       └── ci.yml
+│
+├── data/
+│
+├── src/
+│   └── scheduled_report_bot/
+│       ├── __init__.py
+│       ├── fetch.py
+│       ├── process.py
+│       └── main.py
+│
+├── tests/
+│   └── test_process.py
+│
+├── .gitignore
+├── pyproject.toml
+├── uv.lock
+└── README.md
+```
+
+## Tech Stack
+
+- **Python 3.13** – main programming language.
+- **Requests** – communicates with the GitHub API.
+- **Pytest** – automated testing.
+- **uv** – Python dependency and project management.
+- **GitHub API** – source of repository information.
+- **GitHub Actions** – automated CI and scheduled execution.
+- **Git/GitHub** – version control and project hosting.
+
+### Data
+
+The project uses repository information retrieved from the GitHub API.
+
+Any local example or test data used by the project is **synthetic/example data** and does not represent private or real-world business data. The automated tests use controlled data so that the results are predictable and reproducible.
+
+## Testing
+
+The project contains automated tests for the core processing functionality.
+
+Run all tests with:
 
 ```bash
-python src/main.py
+uv run pytest
+```
+
+The CI workflow also runs these tests automatically after every push and on the configured schedule.
+
+Example:
+
+```text
+============================= test session starts =============================
+collected 4 items
+
+tests/test_process.py ....                                       [100%]
+
+============================== 4 passed ==============================
 ```
 
 ## Automation
 
-The project uses GitHub Actions to:
+The GitHub Actions workflow is configured to run automatically.
 
-- run every day on a schedule
-- allow manual execution using `workflow_dispatch`
-- generate a new report automatically
+It supports:
+
+- **Push** – runs CI after code is pushed.
+- **Pull request** – runs tests for pull requests.
+- **Scheduled execution** – runs automatically according to the configured cron schedule.
+- **Manual execution** – can be started from the GitHub Actions interface.
+
+This means the pipeline can run unattended without requiring the developer to start it manually.
 
 ## Future Improvements
 
-- Send reports to Discord via webhook.
+- Generate a more detailed Markdown or HTML report.
+- Send reports to Discord using a webhook.
 - Send reports by email.
-- Add more repository statistics.
-- Improve report formatting.
+- Track repository statistics over time.
+- Add more GitHub repositories to the report.
+- Add additional automated tests.
+
+## Screenshot / Example Output
+
+Example console output:
+
+```text
+Scheduled Report Bot
+--------------------
+Repository: python/cpython
+Stars: 75000
+Forks: 35000
+Open issues: 12000
+Watchers: 75000
+
+Report generated successfully.
+```
+
+The actual values depend on the current information returned by the GitHub API.
 
 ## License
 
